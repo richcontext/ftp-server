@@ -4,10 +4,6 @@
 
 package server
 
-import (
-	"crypto/subtle"
-)
-
 // Auth is an interface to auth your ftp user login.
 type Auth interface {
 	CheckPasswd(string, string) (bool, error)
