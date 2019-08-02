@@ -54,6 +54,30 @@ func (conn *Conn) IsLogin() bool {
 }
 
 func (conn *Conn) PublicIp() string {
+	log.Println("getting public IP")
+	if conn.server.PublicHostname != "" {
+		log.Println("public IP is hostname. Parsing & Doing DNS lookup")
+		host := conn.server.PublicHostname
+		// Get just the domain name
+		u := strings.Split(host, ":")
+		host = u[0]
+		port := "21"
+		if len(u) > 1 {
+			port = u[1]
+		}
+		ips, err := net.LookupIP(host)
+		if err != nil {
+			return ""
+		}
+		// Return the first ipv4 address
+		for _, v := range ips {
+			if v.To4() != nil {
+				log.Println("found ipv4 address", v.String())
+				return fmt.Sprintf("%s:%s", v.String(), port)
+			}
+		}
+	}
+
 	return conn.server.PublicIp
 }
 
