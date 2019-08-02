@@ -19,7 +19,6 @@ func Version() string {
 	return "0.3.0"
 }
 
-// ServerOpts contains parameters for server.NewServer()
 type ServerOpts struct {
 	// The factory that will be used to create a new FTPDriver instance for
 	// each client connection. This is a mandatory option.
@@ -68,13 +67,15 @@ type ServerOpts struct {
 // Always use the NewServer() method to create a new Server.
 type Server struct {
 	*ServerOpts
-	listenTo  string
-	logger    Logger
-	listener  net.Listener
-	tlsConfig *tls.Config
-	ctx       context.Context
-	cancel    context.CancelFunc
-	feats     string
+	PublicHostname string
+	PublicHostIP   string
+	listenTo       string
+	logger         Logger
+	listener       net.Listener
+	tlsConfig      *tls.Config
+	ctx            context.Context
+	cancel         context.CancelFunc
+	feats          string
 }
 
 // ErrServerClosed is returned by ListenAndServe() or Serve() when a shutdown
@@ -152,6 +153,13 @@ func NewServer(opts *ServerOpts) *Server {
 	opts = serverOptsWithDefaults(opts)
 	s := new(Server)
 	s.ServerOpts = opts
+
+	s.PublicHostIP = s.ServerOpts.PublicIp
+	ip := net.ParseIP(s.ServerOpts.PublicIp)
+	if ip == nil {
+		// Unable to parse IP, must be a hostname?
+		s.PublicHostname = s.ServerOpts.PublicIp
+	}
 	s.listenTo = net.JoinHostPort(opts.Hostname, strconv.Itoa(opts.Port))
 	s.logger = opts.Logger
 	return s
