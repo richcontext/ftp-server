@@ -218,7 +218,7 @@ func (socket *ftpPassiveSocket) GoListenAndServe(sessionID string) (err error) {
 
 	// The timeout, for a remote client to establish connection
 	// with a PASV style data connection.
-	const acceptTimeout = 60 * time.Second
+	const acceptTimeout = 3 * time.Second
 	err = tcplistener.SetDeadline(time.Now().Add(acceptTimeout))
 	if err != nil {
 		socket.logger.Print(sessionID, err)
